@@ -27,6 +27,23 @@ export class Catalogue {
     return removedProduct;
   }
 
+  batchAddProducts(batch) {
+    const productIDClash = batch.products.some(
+        (product) => this.findProductById(product.id) !== undefined
+    );
+    if (productIDClash) {
+      throw new Error("Bad Batch");
+    }
+    const noProductsAdded = batch.products
+        .filter((product) => product.quantityInStock > 0 )
+        .filter((p) => {
+          this.addProduct(p);
+          return true;
+        })
+        .reduce((acc, p) => acc + 1, 0);
+    return noProductsAdded;
+  }
+
   checkReorders() {
     const result = { type: "Reorder", productIds: [] };
     result.productIds = this.products
